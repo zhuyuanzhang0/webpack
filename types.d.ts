@@ -769,7 +769,7 @@ declare class Chunk {
 	): Record<string | number, Record<string, (string | number)[]>>;
 }
 declare class ChunkGraph {
-	constructor(moduleGraph: ModuleGraph, hashFunction?: string | typeof Hash);
+	constructor(moduleGraph: ModuleGraph, hashFunction: string | typeof Hash);
 	moduleGraph: ModuleGraph;
 	connectChunkAndModule(chunk: Chunk, module: Module): void;
 	disconnectChunkAndModule(chunk: Chunk, module: Module): void;
@@ -3944,11 +3944,6 @@ declare interface FileCacheOptions {
 	 * Compression type used for the cache files.
 	 */
 	compression?: false | "gzip" | "brotli";
-
-	/**
-	 * Algorithm used for generation the hash (see node.js crypto package).
-	 */
-	hashAlgorithm?: string;
 
 	/**
 	 * Time in ms after which idle period the cache storing should happen.
@@ -12613,6 +12608,12 @@ declare namespace exports {
 			export const registerNotSerializable: (Constructor: Constructor) => void;
 			export const NOT_SERIALIZABLE: object;
 			export const buffersSerializer: Serializer;
+			export let createBuffersSerializer: (__0: {
+				/**
+				 * hash function
+				 */
+				hashFunction?: string | typeof Hash;
+			}) => Serializer;
 			export let createFileSerializer: (
 				fs?: any,
 				hashFunction?: any
