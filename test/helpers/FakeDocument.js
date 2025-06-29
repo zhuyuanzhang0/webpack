@@ -1,6 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 
+/**
+ * @this {FakeDocument}
+ * @param {string} property property
+ * @returns {EXPECTED_ANY} value
+ */
 function getPropertyValue(property) {
 	return this[property];
 }
@@ -68,15 +73,32 @@ class FakeElement {
 		this.sheet = type === "link" ? new FakeSheet(this, basePath) : undefined;
 	}
 
-	appendChild(node) {
+	_attach(node) {
 		this._document._onElementAttached(node);
 		this._children.push(node);
 		node.parentNode = this;
+	}
+
+	_load(node) {
 		if (node._type === "link") {
 			setTimeout(() => {
 				if (node.onload) node.onload({ type: "load", target: node });
 			}, 100);
+		} else if (node._type === "script" && this._document.onScript) {
+			Promise.resolve().then(() => {
+				this._document.onScript(node.src);
+			});
 		}
+	}
+
+	insertBefore(node, before) {
+		this._attach(node);
+		this._load(node);
+	}
+
+	appendChild(node) {
+		this._attach(node);
+		this._load(node);
 	}
 
 	removeChild(node) {
@@ -209,6 +231,7 @@ class FakeSheet {
 		let css = fs.readFileSync(filepath, "utf-8");
 		css = css
 			// Remove comments
+			// @ts-expect-error we use es2018 for such tests
 			.replace(/\/\*.*?\*\//gms, "")
 			.replace(/@import url\("([^"]+)"\);/g, (match, url) => {
 				if (!/^https:\/\/test\.cases\/path\//.test(url)) {

@@ -2,7 +2,7 @@ const path = require("path");
 const webpack = require("../../../../");
 const supportsAsync = require("../../../helpers/supportsAsync");
 
-/** @type {(env: any, options: any) => import("../../../../").Configuration[]} */
+/** @type {(env: Env, options: TestOptions) => import("../../../../").Configuration[]} */
 module.exports = (env, { testPath }) => [
 	{
 		output: {
@@ -27,6 +27,26 @@ module.exports = (env, { testPath }) => [
 		output: {
 			uniqueName: "esm",
 			filename: "esm.js",
+			library: {
+				type: "module"
+			}
+		},
+		target: "node14",
+		resolve: {
+			alias: {
+				external: "./non-external",
+				"external-named": "./non-external-named"
+			}
+		},
+		experiments: {
+			outputModule: true
+		}
+	},
+	{
+		entry: "./esm-with-commonjs.js",
+		output: {
+			uniqueName: "esm-with-commonjs",
+			filename: "esm-with-commonjs.js",
 			library: {
 				type: "module"
 			}
@@ -229,6 +249,26 @@ module.exports = (env, { testPath }) => [
 						reuseExistingChunk: true
 					}
 				}
+			}
+		},
+		experiments: {
+			outputModule: true
+		}
+	},
+	{
+		entry: ["./foo.js", "./index.js"],
+		output: {
+			uniqueName: "esm-multiple-entry-modules",
+			filename: "esm-multiple-entry-modules.js",
+			library: {
+				type: "module"
+			}
+		},
+		target: "node14",
+		resolve: {
+			alias: {
+				external: "./non-external",
+				"external-named": "./non-external-named"
 			}
 		},
 		experiments: {

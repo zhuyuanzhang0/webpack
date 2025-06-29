@@ -1,7 +1,8 @@
 # webpack.config.js
 
 ```javascript
-var path = require("path");
+const path = require("path");
+
 module.exports = {
 	// mode: "development" || "production",
 	entry: {
@@ -280,7 +281,7 @@ render(__webpack_require__(/*! ./aPage */ 2));
 /******/ 			__webpack_require__.r(ns);
 /******/ 			var def = {};
 /******/ 			leafPrototypes = leafPrototypes || [null, getProto({}), getProto([]), getProto(getProto)];
-/******/ 			for(var current = mode & 2 && value; typeof current == 'object' && !~leafPrototypes.indexOf(current); current = getProto(current)) {
+/******/ 			for(var current = mode & 2 && value; (typeof current == 'object' || typeof current == 'function') && !~leafPrototypes.indexOf(current); current = getProto(current)) {
 /******/ 				Object.getOwnPropertyNames(current).forEach((key) => (def[key] = () => (value[key])));
 /******/ 			}
 /******/ 			def['default'] = () => (value);
@@ -352,6 +353,7 @@ render(__webpack_require__(/*! ./aPage */ 2));
 /******/ 				if (__webpack_require__.nc) {
 /******/ 					script.setAttribute("nonce", __webpack_require__.nc);
 /******/ 				}
+/******/ 		
 /******/ 		
 /******/ 				script.src = url;
 /******/ 			}
@@ -434,7 +436,7 @@ render(__webpack_require__(/*! ./aPage */ 2));
 /******/ 								}
 /******/ 							};
 /******/ 							__webpack_require__.l(url, loadingEnded, "chunk-" + chunkId, chunkId);
-/******/ 						} else installedChunks[chunkId] = 0;
+/******/ 						}
 /******/ 					}
 /******/ 				}
 /******/ 		};
@@ -531,7 +533,7 @@ asset router_js.bundle.js 2.45 KiB [emitted]
 asset aPage.bundle.js 392 bytes [emitted] (name: aPage)
 asset bPage.bundle.js 392 bytes [emitted] (name: bPage)
 Entrypoint pageA 15.8 KiB = router_js.bundle.js 2.45 KiB aPage.bundle.js 392 bytes pageA.bundle.js 13 KiB
-Entrypoint pageB 15.8 KiB = router_js.bundle.js 2.45 KiB bPage.bundle.js 392 bytes pageB.bundle.js 13 KiB
+Entrypoint pageB 15.9 KiB = router_js.bundle.js 2.45 KiB bPage.bundle.js 392 bytes pageB.bundle.js 13 KiB
 chunk (runtime: pageA, pageB) aPage.bundle.js (aPage) 59 bytes [initial] [rendered] reused as split chunk (cache group: default)
   > ./aPage ././ lazy ^\.\/.*Page$ chunkName: [request] namespace object ./aPage
   > ./aEntry pageA
@@ -574,19 +576,19 @@ chunk (runtime: pageA, pageB) router_js.bundle.js 951 bytes [initial] [rendered]
     [used exports unknown]
     entry ./router pageA
     entry ./router pageB
-webpack 5.78.0 compiled successfully
+webpack X.X.X compiled successfully
 ```
 
 ## Production mode
 
 ```
-asset pageA.bundle.js 2.83 KiB [emitted] [minimized] (name: pageA)
-asset pageB.bundle.js 2.83 KiB [emitted] [minimized] (name: pageB)
+asset pageA.bundle.js 2.85 KiB [emitted] [minimized] (name: pageA)
+asset pageB.bundle.js 2.85 KiB [emitted] [minimized] (name: pageB)
 asset router_js.bundle.js 544 bytes [emitted] [minimized]
 asset aPage.bundle.js 117 bytes [emitted] [minimized] (name: aPage)
 asset bPage.bundle.js 117 bytes [emitted] [minimized] (name: bPage)
-Entrypoint pageA 3.48 KiB = router_js.bundle.js 544 bytes aPage.bundle.js 117 bytes pageA.bundle.js 2.83 KiB
-Entrypoint pageB 3.48 KiB = router_js.bundle.js 544 bytes bPage.bundle.js 117 bytes pageB.bundle.js 2.83 KiB
+Entrypoint pageA 3.5 KiB = router_js.bundle.js 544 bytes aPage.bundle.js 117 bytes pageA.bundle.js 2.85 KiB
+Entrypoint pageB 3.5 KiB = router_js.bundle.js 544 bytes bPage.bundle.js 117 bytes pageB.bundle.js 2.85 KiB
 chunk (runtime: pageA, pageB) aPage.bundle.js (aPage) 59 bytes [initial] [rendered] reused as split chunk (cache group: default)
   > ./aPage ././ lazy ^\.\/.*Page$ chunkName: [request] namespace object ./aPage
   > ./aEntry pageA
@@ -629,5 +631,5 @@ chunk (runtime: pageA, pageB) router_js.bundle.js 951 bytes [initial] [rendered]
     [no exports used]
     entry ./router pageA
     entry ./router pageB
-webpack 5.78.0 compiled successfully
+webpack X.X.X compiled successfully
 ```

@@ -103,7 +103,7 @@ describe("JavascriptParser", () => {
 		"var definition": [
 			function () {
 				// eslint-disable-next-line one-var
-				var abc, cde, fgh;
+				let abc, cde, fgh;
 				abc("test");
 				cde.abc("test");
 				cde.ddd.abc("test");
@@ -176,7 +176,7 @@ describe("JavascriptParser", () => {
 		],
 		"renaming with var": [
 			function () {
-				var xyz = abc;
+				const xyz = abc;
 				xyz("test");
 			},
 			{
@@ -246,7 +246,7 @@ describe("JavascriptParser", () => {
 		],
 		"spread calls/literals": [
 			function () {
-				var xyz = [...abc("xyz"), cde];
+				const xyz = [...abc("xyz"), cde];
 				Math.max(...fgh);
 			},
 			{
@@ -365,6 +365,10 @@ describe("JavascriptParser", () => {
 	});
 
 	describe("expression evaluation", () => {
+		/**
+		 * @param {string} source source
+		 * @returns {import("../lib/javascript/JavascriptParser").ParserState} the parser state
+		 */
 		function evaluateInParser(source) {
 			const parser = new JavascriptParser();
 			parser.hooks.call.for("test").tap("JavascriptParserTest", expr => {
@@ -569,6 +573,10 @@ describe("JavascriptParser", () => {
 		};
 
 		for (const key of Object.keys(testCases)) {
+			/**
+			 * @param {import("../lib/javascript/BasicEvaluatedExpression")} evalExpr eval expr
+			 * @returns {string} result
+			 */
 			function evalExprToString(evalExpr) {
 				if (!evalExpr) {
 					return "null";
@@ -703,16 +711,120 @@ describe("JavascriptParser", () => {
 		});
 	});
 
-	describe("optional catch binding support", () => {
-		describe("should accept", () => {
+	describe("parse calculated string", () => {
+		describe("should work", () => {
 			const cases = {
-				"optional binding": "try {} catch {}"
+				123: {
+					code: "123",
+					result: {
+						code: false,
+						conditional: false,
+						range: [0, 3],
+						value: "123"
+					}
+				},
+				"'test'": {
+					code: "'test'",
+					result: {
+						code: false,
+						conditional: false,
+						range: [0, 6],
+						value: "test"
+					}
+				},
+				"'test' + 'test'": {
+					code: "'test' + 'test'",
+					result: {
+						code: false,
+						conditional: false,
+						range: [0, 15],
+						value: "testtest"
+					}
+				},
+				"myVar + 'test'": {
+					code: "myVar + 'test'",
+					result: {
+						code: true,
+						conditional: false,
+						range: undefined,
+						value: ""
+					}
+				},
+				"'test' + myVar": {
+					code: "'test' + myVar",
+					result: {
+						code: true,
+						conditional: false,
+						range: [0, 6],
+						value: "test"
+					}
+				},
+				"true ? 'one' : 'two'": {
+					code: "true ? 'one' : 'two'",
+					result: {
+						code: true,
+						conditional: [
+							{
+								code: false,
+								conditional: false,
+								range: [7, 12],
+								value: "one"
+							},
+							{
+								code: false,
+								conditional: false,
+								range: [15, 20],
+								value: "two"
+							}
+						],
+						range: undefined,
+						value: ""
+					}
+				},
+				"true ? true ? 'one' : 'two' : true ? 'three': 'four'": {
+					code: "true ? true ? 'one' : 'two' : true ? 'three': 'four'",
+					result: {
+						code: true,
+						conditional: [
+							{
+								code: false,
+								conditional: false,
+								range: [14, 19],
+								value: "one"
+							},
+							{
+								code: false,
+								conditional: false,
+								range: [22, 27],
+								value: "two"
+							},
+							{
+								code: false,
+								conditional: false,
+								range: [37, 44],
+								value: "three"
+							},
+							{
+								code: false,
+								conditional: false,
+								range: [46, 52],
+								value: "four"
+							}
+						],
+						range: undefined,
+						value: ""
+					}
+				}
 			};
 			for (const name of Object.keys(cases)) {
 				const expr = cases[name];
 				it(name, () => {
-					const actual = JavascriptParser._parse(expr);
+					const parser = new JavascriptParser();
+					const actual = JavascriptParser._parse(expr.code);
 					expect(typeof actual).toBe("object");
+					expect(
+						parser.parseCalculatedString(actual.body[0].expression)
+					).toEqual(expr.result);
 				});
 			}
 		});

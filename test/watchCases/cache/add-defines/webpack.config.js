@@ -1,3 +1,5 @@
+/** @typedef {import("../../../../").WebpackPluginInstance} WebpackPluginInstance */
+
 const { DefinePlugin } = require("../../../../");
 const currentWatchStep = require("../../../helpers/currentWatchStep");
 
@@ -47,10 +49,14 @@ module.exports = {
 					defines[Number(currentWatchStep.step || 0)]
 				);
 				plugin.apply(
-					/** @type {any} */
+					/** @type {EXPECTED_ANY} */
 					({
 						hooks: {
 							compilation: {
+								/**
+								 * @param {string} name name
+								 * @param {EXPECTED_FUNCTION} fn fn
+								 */
 								tap: (name, fn) => {
 									fn(...args);
 								}

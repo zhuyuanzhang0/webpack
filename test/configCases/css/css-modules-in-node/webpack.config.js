@@ -1,7 +1,7 @@
 const path = require("path");
 const webpack = require("../../../../");
 
-/** @type {(env: any, options: any) => import("../../../../").Configuration[]} */
+/** @type {(env: Env, options: TestOptions) => import("../../../../").Configuration[]} */
 module.exports = (env, { testPath }) => [
 	{
 		context: path.join(__dirname, "../css-modules"),

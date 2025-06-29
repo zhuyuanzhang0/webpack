@@ -1,6 +1,8 @@
-var MCEP = require("mini-css-extract-plugin");
+const MCEP = require("mini-css-extract-plugin");
 
-/** @type {(number, any) => import("../../../../").Configuration} */
+/** @typedef {import("../../../../").StatsCompilation} StatsCompilation */
+
+/** @type {(i: number, options?: import("mini-css-extract-plugin").PluginOptions) => import("../../../../").Configuration} */
 const config = (i, options) => ({
 	entry: {
 		a: "./a",
@@ -37,10 +39,11 @@ const config = (i, options) => ({
 		new MCEP(options),
 		compiler => {
 			compiler.hooks.done.tap("Test", stats => {
-				const chunkIds = stats
-					.toJson({ all: false, chunks: true, ids: true })
-					.chunks.map(c => c.id)
-					.sort();
+				const chunkIds =
+					/** @type {NonNullable<StatsCompilation["chunks"]>} */
+					(stats.toJson({ all: false, chunks: true, ids: true }).chunks)
+						.map(c => c.id)
+						.sort();
 				expect(chunkIds).toEqual([
 					"a",
 					"b",

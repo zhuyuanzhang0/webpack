@@ -2,17 +2,24 @@
 
 require("./helpers/warmup-webpack");
 
+/** @typedef {Record<string, EXPECTED_ANY>} Env */
+/** @typedef {{ testPath: string, srcPath: string }} TestOptions */
+
 const path = require("path");
 const fs = require("graceful-fs");
-const vm = require("vm");
 const rimraf = require("rimraf");
 const checkArrayExpectation = require("./checkArrayExpectation");
 const createLazyTestEnv = require("./helpers/createLazyTestEnv");
 const { remove } = require("./helpers/remove");
 const prepareOptions = require("./helpers/prepareOptions");
 const deprecationTracking = require("./helpers/deprecationTracking");
-const FakeDocument = require("./helpers/FakeDocument");
+const { TestRunner } = require("./runner");
 
+/**
+ * @param {string} src src
+ * @param {string} dest dest
+ * @param {boolean} initial is initial?
+ */
 function copyDiff(src, dest, initial) {
 	if (!fs.existsSync(dest)) fs.mkdirSync(dest);
 	const files = fs.readdirSync(src);
@@ -23,7 +30,7 @@ function copyDiff(src, dest, initial) {
 		if (directory) {
 			copyDiff(srcFile, destFile, initial);
 		} else {
-			var content = fs.readFileSync(srcFile);
+			const content = fs.readFileSync(srcFile);
 			if (/^DELETE\s*$/.test(content.toString("utf-8"))) {
 				fs.unlinkSync(destFile);
 			} else if (/^DELETE_DIRECTORY\s*$/.test(content.toString("utf-8"))) {
@@ -52,9 +59,7 @@ const describeCases = config => {
 		}
 
 		const casesPath = path.join(__dirname, "watchCases");
-		let categories = fs.readdirSync(casesPath);
-
-		categories = categories.map(cat => ({
+		const categories = fs.readdirSync(casesPath).map(cat => ({
 			name: cat,
 			tests: fs
 				.readdirSync(path.join(casesPath, cat))
@@ -98,6 +103,7 @@ const describeCases = config => {
 							testName
 						);
 						const testDirectory = path.join(casesPath, category.name, testName);
+						/** @type {TODO} */
 						const runs = fs
 							.readdirSync(testDirectory)
 							.sort()
@@ -135,11 +141,17 @@ const describeCases = config => {
 								if (!options.entry) options.entry = "./index.js";
 								if (!options.target) options.target = "async-node";
 								if (!options.output) options.output = {};
+								if (options.output.clean === undefined)
+									options.output.clean = true;
 								if (!options.output.path) options.output.path = outputDirectory;
 								if (typeof options.output.pathinfo === "undefined")
 									options.output.pathinfo = true;
 								if (!options.output.filename)
-									options.output.filename = "bundle.js";
+									options.output.filename = `bundle${
+										options.experiments && options.experiments.outputModule
+											? ".mjs"
+											: ".js"
+									}`;
 								if (options.cache && options.cache.type === "filesystem") {
 									const cacheDirectory = path.join(tempDirectory, ".cache");
 									options.cache.cacheDirectory = cacheDirectory;
@@ -193,7 +205,7 @@ const describeCases = config => {
 									{
 										aggregateTimeout: 1000
 									},
-									(err, stats) => {
+									async (err, stats) => {
 										if (err) return compilationFinished(err);
 										if (!stats) {
 											return compilationFinished(
@@ -258,81 +270,6 @@ const describeCases = config => {
 										)
 											return;
 
-										const globalContext = {
-											console: console,
-											expect: expect,
-											setTimeout,
-											clearTimeout,
-											document: new FakeDocument()
-										};
-
-										function _require(currentDirectory, module) {
-											if (Array.isArray(module) || /^\.\.?\//.test(module)) {
-												let fn;
-												let content;
-												let p;
-												if (Array.isArray(module)) {
-													p = path.join(currentDirectory, module[0]);
-													content = module
-														.map(arg => {
-															p = path.join(currentDirectory, arg);
-															return fs.readFileSync(p, "utf-8");
-														})
-														.join("\n");
-												} else {
-													p = path.join(currentDirectory, module);
-													content = fs.readFileSync(p, "utf-8");
-												}
-												if (
-													options.target === "web" ||
-													options.target === "webworker"
-												) {
-													fn = vm.runInNewContext(
-														"(function(require, module, exports, __dirname, __filename, it, WATCH_STEP, STATS_JSON, STATE, expect, window, self) {" +
-															`function nsObj(m) { Object.defineProperty(m, Symbol.toStringTag, { value: "Module" }); return m; }${
-																content
-															}\n})`,
-														globalContext,
-														p
-													);
-												} else {
-													fn = vm.runInThisContext(
-														"(function(require, module, exports, __dirname, __filename, it, WATCH_STEP, STATS_JSON, STATE, expect) {" +
-															"global.expect = expect;" +
-															`function nsObj(m) { Object.defineProperty(m, Symbol.toStringTag, { value: "Module" }); return m; }${
-																content
-															}\n})`,
-														p
-													);
-												}
-												const m = {
-													exports: {}
-												};
-												fn.call(
-													m.exports,
-													_require.bind(null, path.dirname(p)),
-													m,
-													m.exports,
-													path.dirname(p),
-													p,
-													run.it,
-													run.name,
-													jsonStats,
-													state,
-													expect,
-													globalContext,
-													globalContext
-												);
-												return module.exports;
-											} else if (
-												testConfig.modules &&
-												module in testConfig.modules
-											) {
-												return testConfig.modules[module];
-											}
-											return jest.requireActual(module);
-										}
-
 										let testConfig = {};
 										try {
 											// try to load a test file
@@ -345,10 +282,54 @@ const describeCases = config => {
 
 										if (testConfig.noTests)
 											return process.nextTick(compilationFinished);
-										_require(
+										const runner = new TestRunner({
+											target: options.target,
+											outputDirectory,
+											testMeta: {
+												category: category.name,
+												name: testName,
+												env: "jsdom"
+											},
+											testConfig: {
+												...testConfig,
+												evaluateScriptOnAttached: true
+											},
+											webpackOptions: options
+										});
+										runner.mergeModuleScope({
+											it: run.it,
+											beforeEach: _beforeEach,
+											afterEach: _afterEach,
+											STATS_JSON: jsonStats,
+											STATE: state,
+											WATCH_STEP: run.name
+										});
+										const getBundle = (outputDirectory, module) => {
+											if (Array.isArray(module)) {
+												return module.map(arg =>
+													path.join(outputDirectory, arg)
+												);
+											} else if (module instanceof RegExp) {
+												return fs
+													.readdirSync(outputDirectory)
+													.filter(f => module.test(f))
+													.map(f => path.join(outputDirectory, f));
+											}
+											return [path.join(outputDirectory, module)];
+										};
+
+										const promises = [];
+										for (const p of getBundle(
 											outputDirectory,
 											testConfig.bundlePath || "./bundle.js"
-										);
+										)) {
+											promises.push(
+												Promise.resolve().then(() =>
+													runner.require(outputDirectory, p)
+												)
+											);
+										}
+										await Promise.all(promises);
 
 										if (run.getNumberOfTests() < 1)
 											return compilationFinished(
@@ -418,6 +399,12 @@ const describeCases = config => {
 						afterAll(() => {
 							remove(tempDirectory);
 						});
+
+						const {
+							it: _it,
+							beforeEach: _beforeEach,
+							afterEach: _afterEach
+						} = createLazyTestEnv(10000);
 					});
 				}
 			});

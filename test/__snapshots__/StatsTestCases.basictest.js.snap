@@ -1,4 +1,4 @@
-// Jest Snapshot v1, https://goo.gl/fbAQLP
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
 exports[`StatsTestCases should print correct stats for aggressive-splitting-entry 1`] = `
 "fitting:
@@ -496,6 +496,69 @@ all:
     runtime modules X KiB 10 modules
     ./a.js X bytes [built] [code generated]
   all (webpack x.x.x) compiled successfully"
+`;
+
+exports[`StatsTestCases should print correct stats for cause-error 1`] = `
+"asset main.js X KiB [emitted] (name: main)
+./index.js X bytes [built] [code generated]
+
+WARNING in aggregate error
+  [cause]: cause
+  cause
+  cause
+    [cause]: nested string cause
+  [errors]: first error
+    [cause]: cause
+      [cause]: nested cause in errors
+  [errors]: second string error
+  [errors]: third nested aggregate error
+    [errors]: nested first
+    [errors]: nested second
+
+WARNING in error with case
+  [cause]: error case
+
+WARNING in error with nested error case
+  [cause]: test
+    [cause]: nested case
+
+WARNING in error with string case
+  [cause]: string case
+
+WARNING in webpack error with case
+  [cause]: cause
+
+WARNING in webpack error
+
+ERROR in aggregate error
+  [cause]: cause
+  cause
+  cause
+    [cause]: nested string cause
+  [errors]: first error
+    [cause]: cause
+      [cause]: nested cause in errors
+  [errors]: second string error
+  [errors]: third nested aggregate error
+    [errors]: nested first
+    [errors]: nested second
+
+ERROR in error with case
+  [cause]: error case
+
+ERROR in error with nested error case
+  [cause]: test
+    [cause]: nested case
+
+ERROR in error with string case
+  [cause]: string case
+
+ERROR in webpack error with case
+  [cause]: cause
+
+ERROR in webpack error
+
+error cause (webpack x.x.x) compiled with 6 errors and 6 warnings in X ms"
 `;
 
 exports[`StatsTestCases should print correct stats for child-compiler-apply-entry-option 1`] = `
@@ -1495,9 +1558,9 @@ asset <CLR=32,BOLD>main.js</CLR> X bytes <CLR=32,BOLD>[emitted]</CLR> (name: mai
 
 <CLR=31,BOLD>DEBUG</CLR> <CLR=BOLD>LOG from ./node_modules/custom-loader/index.js ./node_modules/custom-loader/index.js!./index.js</CLR>
 <e> <CLR=31,BOLD>An error</CLR>
-|     at Object.<anonymous>.module.exports (Xdir/logging/node_modules/custom-loader/index.js:5:9)
+|     at Object.module.exports (Xdir/logging/node_modules/custom-loader/index.js:5:9)
 <w> <CLR=33,BOLD>A warning</CLR>
-|     at Object.<anonymous>.module.exports (Xdir/logging/node_modules/custom-loader/index.js:6:9)
+|     at Object.module.exports (Xdir/logging/node_modules/custom-loader/index.js:6:9)
 <-> <CLR=36,BOLD>Unimportant</CLR>
   <i> <CLR=32,BOLD>Info message</CLR>
       <CLR=BOLD>Just log</CLR>
@@ -1506,7 +1569,7 @@ asset <CLR=32,BOLD>main.js</CLR> X bytes <CLR=32,BOLD>[emitted]</CLR> (name: mai
   <-> <CLR=36,BOLD>Nested</CLR>
         <CLR=BOLD>Log inside collapsed group</CLR>
       Trace
-  |     at Object.<anonymous>.module.exports (Xdir/logging/node_modules/custom-loader/index.js:15:9)
+  |     at Object.module.exports (Xdir/logging/node_modules/custom-loader/index.js:15:9)
   <t> <CLR=35,BOLD>Measure: X ms</CLR>
       -------
       <CLR=BOLD>After clear</CLR>
@@ -4775,20 +4838,20 @@ global:
 exports[`StatsTestCases should print correct stats for track-returned 1`] = `
 "asset bundle.js X KiB [emitted] (name: main)
 ./index.js X KiB [built] [code generated]
-./used3.js X bytes [built] [code generated]
-./used.js X bytes [built] [code generated]
-./used7.js X bytes [built] [code generated]
-./used8.js X bytes [built] [code generated]
-./used9.js X bytes [built] [code generated]
-./used16.js X bytes [built] [code generated]
-./used69.js X bytes [built] [code generated]
-./used17.js X bytes [built] [code generated]
-./used18.js X bytes [built] [code generated]
-./used19.js X bytes [built] [code generated]
-./used48.js X bytes [built] [code generated]
-./used35.js X bytes [built] [code generated]
-./used10.js X bytes [built] [code generated]
-+ 112 modules
+./used.js?n=171 X bytes [built] [code generated]
+./used.js?n=164 X bytes [built] [code generated]
+./used.js?n=165 X bytes [built] [code generated]
+./used.js?n=166 X bytes [built] [code generated]
+./used.js?n=172 X bytes [built] [code generated]
+./used.js?n=173 X bytes [built] [code generated]
+./used.js?n=174 X bytes [built] [code generated]
+./used.js?n=167 X bytes [built] [code generated]
+./used.js?n=175 X bytes [built] [code generated]
+./used.js?n=176 X bytes [built] [code generated]
+./used.js?n=177 X bytes [built] [code generated]
+./used.js?n=178 X bytes [built] [code generated]
+./used.js?n=245 X bytes [built] [code generated]
++ 232 modules
 webpack x.x.x compiled successfully in X ms"
 `;
 

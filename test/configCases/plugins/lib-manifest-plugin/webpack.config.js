@@ -1,7 +1,7 @@
-var path = require("path");
-var LibManifestPlugin = require("../../../../").LibManifestPlugin;
+const path = require("path");
+const LibManifestPlugin = require("../../../../").LibManifestPlugin;
 
-/** @type {(env: any, options: any) => import("../../../../").Configuration} */
+/** @type {(env: Env, options: TestOptions) => import("../../../../").Configuration} */
 module.exports = (env, { testPath }) => ({
 	entry: {
 		bundle0: ["./"]

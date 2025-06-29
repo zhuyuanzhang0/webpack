@@ -1,6 +1,6 @@
-var path = require("path");
+const path = require("path");
 
-/** @type {(env: any, options: any) => import("../../../../types").Configuration} */
+/** @type {(env: Env, options: TestOptions) => import("../../../../types").Configuration} */
 module.exports = (env, { testPath }) => ({
 	target: "node14",
 	output: {

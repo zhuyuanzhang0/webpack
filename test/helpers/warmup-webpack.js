@@ -1,5 +1,6 @@
 describe("warmup", () => {
 	it("should warmup webpack", done => {
+		/** @type {typeof import("../../") | undefined} */
 		let webpack = require("../../");
 		const END = new Error("end warmup");
 		webpack(

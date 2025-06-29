@@ -15,6 +15,24 @@ declare namespace NodeJS {
 	}
 }
 
+declare module "typescript-iterable" {
+	// New iterator interfaces from `lib.es2015.iterable.d.ts` for compatibility with old typescript versions and `dispose`
+	interface Disposable {
+		[Symbol.dispose](): void;
+	}
+
+	export interface IteratorObject<T, TReturn = unknown, TNext = unknown>
+		extends Iterator<T, TReturn, TNext>,
+			Disposable {
+		[Symbol.iterator](): IteratorObject<T, TReturn, TNext>;
+	}
+
+	export interface SetIterator<T>
+		extends IteratorObject<T, BuiltinIteratorReturn, unknown> {
+		[Symbol.iterator](): SetIterator<T>;
+	}
+}
+
 declare module "neo-async" {
 	interface QueueObject<T, E> {
 		push(item: T): void;
@@ -136,10 +154,7 @@ declare module "@webassemblyjs/ast" {
 		Start?: (p: NodePath<Start>) => void;
 		Global?: (p: NodePath<Global>) => void;
 	}
-	export function traverse(
-		ast: AST,
-		visitor: Visitor
-	): void;
+	export function traverse(ast: AST, visitor: Visitor): void;
 	export class NodePath<T> {
 		node: T;
 		remove(): void;
@@ -231,7 +246,11 @@ declare module "@webassemblyjs/ast" {
 		init: Node[]
 	): ObjectInstruction;
 	export function signature(params: FuncParam[], results: string[]): Signature;
-	export function func(initFuncId: Identifier, signature: Signature, funcBody: Instruction[]): Func;
+	export function func(
+		initFuncId: Identifier,
+		signature: Signature,
+		funcBody: Instruction[]
+	): Func;
 	export function typeInstruction(
 		id: Identifier | undefined,
 		functype: Signature
@@ -246,7 +265,10 @@ declare module "@webassemblyjs/ast" {
 		index: Index
 	): ModuleExportDescr;
 
-	export function getSectionMetadata(ast: AST, section: string): { vectorOfSize: { value: number } };
+	export function getSectionMetadata(
+		ast: AST,
+		section: string
+	): { vectorOfSize: { value: number } };
 	export class FuncSignature {
 		args: string[];
 		result: string[];
@@ -261,162 +283,55 @@ declare module "@webassemblyjs/ast" {
 }
 
 declare module "@webassemblyjs/wasm-parser" {
-	export function decode(source: string | Buffer, options: { dump?: boolean, ignoreCodeSection?: boolean, ignoreDataSection?: boolean, ignoreCustomNameSection?: boolean }): import("@webassemblyjs/ast").AST;
+	export function decode(
+		source: string | Buffer,
+		options: {
+			dump?: boolean;
+			ignoreCodeSection?: boolean;
+			ignoreDataSection?: boolean;
+			ignoreCustomNameSection?: boolean;
+		}
+	): import("@webassemblyjs/ast").AST;
 }
 
 declare module "@webassemblyjs/wasm-edit" {
-	export function addWithAST(ast: import("@webassemblyjs/ast").AST, bin: any, newNodes: import("@webassemblyjs/ast").Node[]): ArrayBuffer;
-	export function editWithAST(ast: import("@webassemblyjs/ast").AST, bin: any, visitors: import("@webassemblyjs/ast").Visitor): ArrayBuffer;
+	export function addWithAST(
+		ast: import("@webassemblyjs/ast").AST,
+		bin: any,
+		newNodes: import("@webassemblyjs/ast").Node[]
+	): ArrayBuffer;
+	export function editWithAST(
+		ast: import("@webassemblyjs/ast").AST,
+		bin: any,
+		visitors: import("@webassemblyjs/ast").Visitor
+	): ArrayBuffer;
 }
 
 declare module "webpack-sources" {
-	export type MapOptions = { columns?: boolean; module?: boolean };
-
-	export type RawSourceMap = {
-		version: number;
-		sources: string[];
-		names: string[];
-		sourceRoot?: string;
-		sourcesContent?: string[];
-		mappings: string;
-		file: string;
-	};
-
-	export abstract class Source {
-		size(): number;
-
-		map(options?: MapOptions): RawSourceMap | null;
-
-		sourceAndMap(options?: MapOptions): {
-			source: string | Buffer;
-			map: Object;
-		};
-
-		updateHash(hash: import("./lib/util/Hash")): void;
-
-		source(): string | Buffer;
-
-		buffer(): Buffer;
-	}
-
-	export class RawSource extends Source {
-		constructor(source: string | Buffer, convertToString?: boolean);
-
-		isBuffer(): boolean;
-	}
-
-	export class OriginalSource extends Source {
-		constructor(source: string | Buffer, name: string);
-
-		getName(): string;
-	}
-
-	export class ReplaceSource extends Source {
-		constructor(source: Source, name?: string);
-
-		replace(start: number, end: number, newValue: string, name?: string): void;
-		insert(pos: number, newValue: string, name?: string): void;
-
-		getName(): string;
-		original(): string;
-		getReplacements(): {
-			start: number;
-			end: number;
-			content: string;
-			insertIndex: number;
-			name: string;
-		}[];
-	}
-
-	export class SourceMapSource extends Source {
-		constructor(
-			source: string | Buffer,
-			name: string,
-			sourceMap: Object | string | Buffer,
-			originalSource?: string | Buffer,
-			innerSourceMap?: Object | string | Buffer,
-			removeOriginalSource?: boolean
-		);
-
-		getArgsAsBuffers(): [
-			Buffer,
-			string,
-			Buffer,
-			Buffer | undefined,
-			Buffer | undefined,
-			boolean
-		];
-	}
-
-	export class ConcatSource extends Source {
-		constructor(...args: (string | Source)[]);
-
-		getChildren(): Source[];
-
-		add(item: string | Source): void;
-		addAllSkipOptimizing(items: Source[]): void;
-	}
-
-	export class PrefixSource extends Source {
-		constructor(prefix: string, source: string | Source);
-
-		original(): Source;
-		getPrefix(): string;
-	}
-
-	export class CachedSource extends Source {
-		constructor(source: Source);
-		constructor(source: Source | (() => Source), cachedData?: any);
-
-		original(): Source;
-		originalLazy(): Source | (() => Source);
-		getCachedData(): any;
-	}
-
-	export class SizeOnlySource extends Source {
-		constructor(size: number);
-	}
-
-	interface SourceLike {
-		source(): string | Buffer;
-	}
-
-	export class CompatSource extends Source {
-		constructor(sourceLike: SourceLike);
-
-		static from(sourceLike: SourceLike): Source;
-	}
-}
-
-declare module "browserslist" {
-	function browserslist(query: string): string[] | undefined;
-	namespace browserslist {
-		export function loadConfig(
-			options:
-				| {
-						config: string;
-						env?: string;
-				  }
-				| {
-						path: string;
-						env?: string;
-				  }
-		): string | undefined;
-		export function findConfig(path: string): Record<string, string[]>;
-	}
-	export = browserslist;
+	export {
+		SourceLike,
+		RawSourceMap,
+		MapOptions,
+		Source,
+		RawSource,
+		OriginalSource,
+		ReplaceSource,
+		SourceMapSource,
+		ConcatSource,
+		PrefixSource,
+		CachedSource,
+		SizeOnlySource,
+		CompatSource
+	} from "webpack-sources/types";
 }
 
 declare module "json-parse-even-better-errors" {
-	function parseJson(text: string, reviver?: (this: any, key: string, value: any) => any, context?: number): any;
+	function parseJson(
+		text: string,
+		reviver?: (this: any, key: string, value: any) => any,
+		context?: number
+	): any;
 	export = parseJson;
-}
-
-// TODO remove that when @types/estree is updated
-interface ImportAttributeNode {
-	type: "ImportAttribute";
-	key: import("estree").Identifier | import("estree").Literal;
-	value: import("estree").Literal;
 }
 
 type RecursiveArrayOrRecord<T> =
@@ -425,8 +340,11 @@ type RecursiveArrayOrRecord<T> =
 	| T;
 
 declare module "loader-runner" {
-	export function getContext(resource: string) : string;
-	export function runLoaders(options: any, callback: (err: Error | null, result: any) => void): void;
+	export function getContext(resource: string): string;
+	export function runLoaders(
+		options: any,
+		callback: (err: Error | null, result: any) => void
+	): void;
 }
 
 declare module "watchpack" {
@@ -436,7 +354,10 @@ declare module "watchpack" {
 		constructor(options: import("./declarations/WebpackOptions").WatchOptions);
 		once(eventName: string, callback: any): void;
 		watch(options: any): void;
-		collectTimeInfoEntries(fileTimeInfoEntries: Map<string, number>, contextTimeInfoEntries: Map<string, number>): void;
+		collectTimeInfoEntries(
+			fileTimeInfoEntries: Map<string, number>,
+			contextTimeInfoEntries: Map<string, number>
+		): void;
 		pause(): void;
 		close(): void;
 	}

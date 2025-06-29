@@ -2,7 +2,7 @@ require("./helpers/warmup-webpack");
 
 const path = require("path");
 const jestDiff = require("jest-diff").diff;
-const stripAnsi = require("strip-ansi");
+const stripVTControlCharacters = require("strip-ansi");
 
 /**
  * Escapes regular expression metacharacters
@@ -243,6 +243,7 @@ describe("snapshots", () => {
 		        "dynamicImportMode": "lazy",
 		        "dynamicImportPrefetch": false,
 		        "dynamicImportPreload": false,
+		        "dynamicUrl": true,
 		        "exprContextCritical": true,
 		        "exprContextRecursive": true,
 		        "exprContextRegExp": false,
@@ -678,7 +679,7 @@ describe("snapshots", () => {
 				if (before) before();
 				const result = getDefaultConfig(options);
 
-				const diff = stripAnsi(
+				const diff = stripVTControlCharacters(
 					jestDiff(baseConfig, result, { expand: false, contextLines: 0 })
 				);
 
@@ -966,6 +967,9 @@ describe("snapshots", () => {
 		@@ ... @@
 		-     "hotUpdateChunkFilename": "[id].[fullhash].hot-update.js",
 		+     "hotUpdateChunkFilename": "[id].[fullhash].hot-update.mjs",
+		@@ ... @@
+		-     "hotUpdateMainFilename": "[runtime].[fullhash].hot-update.json",
+		+     "hotUpdateMainFilename": "[runtime].[fullhash].hot-update.json.mjs",
 		@@ ... @@
 		-     "iife": true,
 		+     "iife": false,
@@ -2662,7 +2666,7 @@ it("should result in the same target options for same target", () => {
 	const browserslistTarget = getDefaultConfig({
 		target: "browserslist: node 12.17"
 	});
-	const diff = stripAnsi(
+	const diff = stripVTControlCharacters(
 		jestDiff(inlineTarget, browserslistTarget, {
 			expand: false,
 			contextLines: 0
