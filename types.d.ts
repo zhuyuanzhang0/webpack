@@ -263,7 +263,6 @@ type ArrayBufferView<TArrayBuffer extends ArrayBufferLike = ArrayBufferLike> =
 	| Int32Array
 	| BigUint64Array
 	| BigInt64Array
-	| Float16Array
 	| Float32Array
 	| Float64Array
 	| DataView;
@@ -530,59 +529,16 @@ declare interface BannerPluginOptions {
 	test?: string | RegExp | Rule[];
 }
 declare interface BaseResolveRequest {
-	/**
-	 * path
-	 */
 	path: string | false;
-
-	/**
-	 * content
-	 */
 	context?: object;
-
-	/**
-	 * description file path
-	 */
 	descriptionFilePath?: string;
-
-	/**
-	 * description file root
-	 */
 	descriptionFileRoot?: string;
-
-	/**
-	 * description file data
-	 */
 	descriptionFileData?: JsonObjectTypes;
-
-	/**
-	 * relative path
-	 */
 	relativePath?: string;
-
-	/**
-	 * true when need to ignore symlinks, otherwise false
-	 */
 	ignoreSymlinks?: boolean;
-
-	/**
-	 * true when full specified, otherwise false
-	 */
 	fullySpecified?: boolean;
-
-	/**
-	 * inner request for internal usage
-	 */
 	__innerRequest?: string;
-
-	/**
-	 * inner request for internal usage
-	 */
 	__innerRequest_request?: string;
-
-	/**
-	 * inner relative path for internal usage
-	 */
 	__innerRequest_relativePath?: string;
 }
 declare abstract class BasicEvaluatedExpression {
@@ -944,39 +900,12 @@ declare interface BufferEntry {
 	bufferedMap?: null | BufferedMap;
 }
 declare interface BufferedMap {
-	/**
-	 * version
-	 */
 	version: number;
-
-	/**
-	 * sources
-	 */
 	sources: string[];
-
-	/**
-	 * name
-	 */
 	names: string[];
-
-	/**
-	 * source root
-	 */
 	sourceRoot?: string;
-
-	/**
-	 * sources content
-	 */
 	sourcesContent?: ("" | Buffer)[];
-
-	/**
-	 * mappings
-	 */
 	mappings?: Buffer;
-
-	/**
-	 * file
-	 */
 	file: string;
 }
 type BuildInfo = KnownBuildInfo & Record<string, any>;
@@ -990,7 +919,7 @@ declare abstract class ByTypeGenerator extends Generator {
 	) => null | Source;
 }
 declare const CIRCULAR_CONNECTION: unique symbol;
-declare class CacheClass {
+declare class Cache {
 	constructor();
 	hooks: {
 		get: AsyncSeriesBailHook<
@@ -1098,33 +1027,11 @@ declare interface CacheGroupsContext {
 	chunkGraph: ChunkGraph;
 }
 type CacheOptionsNormalized = false | FileCacheOptions | MemoryCacheOptions;
-declare interface CacheTypes {
-	[index: string]: undefined | ResolveRequest | ResolveRequest[];
-}
 declare interface CachedData {
-	/**
-	 * source
-	 */
 	source?: boolean;
-
-	/**
-	 * buffer
-	 */
 	buffer: Buffer;
-
-	/**
-	 * size
-	 */
 	size?: number;
-
-	/**
-	 * maps
-	 */
 	maps: Map<string, BufferEntry>;
-
-	/**
-	 * hash
-	 */
 	hash?: (string | Buffer)[];
 }
 declare class CachedSource extends Source {
@@ -2631,7 +2538,7 @@ declare class Compiler {
 	options: WebpackOptionsNormalized;
 	context: string;
 	requestShortener: RequestShortener;
-	cache: CacheClass;
+	cache: Cache;
 	moduleMemCaches?: Map<Module, ModuleMemCachesItem>;
 	compilerPath: string;
 	running: boolean;
@@ -3858,7 +3765,7 @@ declare interface DeterministicModuleIdsPluginOptions {
 	failOnConflict?: boolean;
 }
 type DevtoolModuleFilenameTemplate = string | ((context?: any) => string);
-declare interface Dirent<T extends string | Buffer = string> {
+declare interface DirentFs<T extends string | Buffer = string> {
 	/**
 	 * true when is file, otherwise false
 	 */
@@ -3908,6 +3815,17 @@ declare interface Dirent<T extends string | Buffer = string> {
 	 * path
 	 */
 	path?: string;
+}
+declare interface DirentTypes {
+	isFile: () => boolean;
+	isDirectory: () => boolean;
+	isBlockDevice: () => boolean;
+	isCharacterDevice: () => boolean;
+	isSymbolicLink: () => boolean;
+	isFIFO: () => boolean;
+	isSocket: () => boolean;
+	name: string;
+	path: string;
 }
 declare interface Disposable {
 	[Symbol.dispose](): void;
@@ -5143,6 +5061,11 @@ declare interface ExternalModuleInfo {
 	runtimeCondition?: string | boolean | SortableSet<string>;
 	index: number;
 	name?: string;
+	chunkInitFragments?: InitFragment<ChunkRenderContextJavascriptModulesPlugin>[];
+	runtimeRequirements?: ReadonlySet<string>;
+	exportMap?: Map<string, string | string[] | { name: string[] }>;
+	rawExportMap?: Map<string, string | string[]>;
+	namespaceExportSymbol?: string;
 	interopNamespaceObjectUsed: boolean;
 	interopNamespaceObjectName?: string;
 	interopNamespaceObject2Used: boolean;
@@ -5399,45 +5322,18 @@ declare interface FileCacheOptions {
 	version?: string;
 }
 declare interface FileSystem {
-	/**
-	 * read file method
-	 */
 	readFile: ReadFileTypes;
-
-	/**
-	 * readdir method
-	 */
 	readdir: ReaddirTypes;
-
-	/**
-	 * read json method
-	 */
 	readJson?: (
-		pathOrFileDescription: PathOrFileDescriptorTypes,
-		callback: (
-			err: null | Error | NodeJS.ErrnoException,
-			result?: JsonObjectTypes
+		arg0: PathOrFileDescriptorTypes,
+		arg1: (
+			arg0: null | Error | NodeJS.ErrnoException,
+			arg1?: JsonObjectTypes
 		) => void
 	) => void;
-
-	/**
-	 * read link method
-	 */
 	readlink: ReadlinkTypes;
-
-	/**
-	 * lstat method
-	 */
 	lstat?: LStatTypes;
-
-	/**
-	 * stat method
-	 */
 	stat: StatTypes;
-
-	/**
-	 * realpath method
-	 */
 	realpath?: RealPathTypes;
 }
 declare abstract class FileSystemInfo {
@@ -5592,19 +5488,8 @@ declare interface GenerateContext {
 	getData?: () => Map<string, any>;
 }
 declare interface GeneratedSourceInfo {
-	/**
-	 * generated line
-	 */
 	generatedLine?: number;
-
-	/**
-	 * generated column
-	 */
 	generatedColumn?: number;
-
-	/**
-	 * source
-	 */
 	source?: string;
 }
 declare class Generator {
@@ -5858,14 +5743,7 @@ declare class Hash {
 }
 type HashFunction = string | typeof Hash;
 declare interface HashLike {
-	/**
-	 * make hash update
-	 */
 	update: (data: string | Buffer, inputEncoding?: string) => HashLike;
-
-	/**
-	 * get hash digest
-	 */
 	digest: (encoding?: string) => string | Buffer;
 }
 declare interface HashableObject {
@@ -8160,9 +8038,6 @@ declare interface KnownCreateStatsOptionsContext {
 	forToString?: boolean;
 }
 declare interface KnownHooks {
-	/**
-	 * resolve step hook
-	 */
 	resolveStep: SyncHook<
 		[
 			AsyncSeriesBailHook<
@@ -8172,23 +8047,11 @@ declare interface KnownHooks {
 			ResolveRequest
 		]
 	>;
-
-	/**
-	 * no resolve hook
-	 */
 	noResolve: SyncHook<[ResolveRequest, Error]>;
-
-	/**
-	 * resolve hook
-	 */
 	resolve: AsyncSeriesBailHook<
 		[ResolveRequest, ResolveContext],
 		null | ResolveRequest
 	>;
-
-	/**
-	 * result hook
-	 */
 	result: AsyncSeriesHook<[ResolveRequest, ResolveContext]>;
 }
 declare interface KnownNormalizedStatsOptions {
@@ -8561,24 +8424,24 @@ declare interface LStatSync {
 declare interface LStatTypes {
 	(
 		path: PathLikeTypes,
-		callback: (err: null | NodeJS.ErrnoException, result?: IStats) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: IStats) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: undefined | (StatOptions & { bigint?: false }),
-		callback: (err: null | NodeJS.ErrnoException, result?: IStats) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: IStats) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: StatOptions & { bigint: true },
-		callback: (err: null | NodeJS.ErrnoException, result?: IBigIntStats) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: IBigIntStats) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: undefined | StatOptions,
 		callback: (
-			err: null | NodeJS.ErrnoException,
-			result?: IStats | IBigIntStats
+			arg0: null | NodeJS.ErrnoException,
+			arg1?: IStats | IBigIntStats
 		) => void
 	): void;
 }
@@ -9317,14 +9180,7 @@ declare interface MakeDirectoryOptions {
 	mode?: string | number;
 }
 declare interface MapOptions {
-	/**
-	 * need columns?
-	 */
 	columns?: boolean;
-
-	/**
-	 * is module
-	 */
 	module?: boolean;
 }
 declare interface MatchObject {
@@ -11487,7 +11343,7 @@ declare class OriginalSource extends Source {
 			source: null | string,
 			sourceContent?: string
 		) => void,
-		_onName: (nameIndex: number, name: string) => void
+		onName: (nameIndex: number, name: string) => void
 	): GeneratedSourceInfo;
 }
 
@@ -12061,39 +11917,12 @@ declare interface ParameterizedComparator<TArg extends object, T> {
 	(tArg: TArg): Comparator<T>;
 }
 declare interface ParsedIdentifier {
-	/**
-	 * request
-	 */
 	request: string;
-
-	/**
-	 * query
-	 */
 	query: string;
-
-	/**
-	 * fragment
-	 */
 	fragment: string;
-
-	/**
-	 * is directory
-	 */
 	directory: boolean;
-
-	/**
-	 * is module
-	 */
 	module: boolean;
-
-	/**
-	 * is file
-	 */
 	file: boolean;
-
-	/**
-	 * is internal
-	 */
 	internal: boolean;
 }
 declare class Parser {
@@ -12306,16 +12135,13 @@ type Plugin =
 	| false
 	| ""
 	| 0
-	| { apply: (this: Resolver, resolver: Resolver) => void }
-	| ((this: Resolver, resolver: Resolver) => void);
+	| { apply: (arg0: Resolver) => void }
+	| ((this: Resolver, arg1: Resolver) => void);
 declare interface PnpApi {
-	/**
-	 * resolve to unqualified
-	 */
 	resolveToUnqualified: (
-		packageName: string,
-		issuer: string,
-		options: { considerBuiltins: boolean }
+		arg0: string,
+		arg1: string,
+		arg2: object
 	) => null | string;
 }
 declare class PrefetchPlugin {
@@ -12594,49 +12420,14 @@ declare class RawSource extends Source {
 	): GeneratedSourceInfo;
 }
 declare interface RawSourceMap {
-	/**
-	 * version
-	 */
 	version: number;
-
-	/**
-	 * sources
-	 */
 	sources: string[];
-
-	/**
-	 * names
-	 */
 	names: string[];
-
-	/**
-	 * source root
-	 */
 	sourceRoot?: string;
-
-	/**
-	 * sources content
-	 */
 	sourcesContent?: string[];
-
-	/**
-	 * mappings
-	 */
 	mappings: string;
-
-	/**
-	 * file
-	 */
 	file: string;
-
-	/**
-	 * debug id
-	 */
 	debugId?: string;
-
-	/**
-	 * ignore list
-	 */
 	ignoreList?: number[];
 }
 declare interface Read<
@@ -12818,7 +12609,7 @@ declare interface ReadFileTypes {
 			| undefined
 			| null
 			| ({ encoding?: null; flag?: string } & Abortable),
-		callback: (err: null | NodeJS.ErrnoException, result?: Buffer) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: Buffer) => void
 	): void;
 	(
 		path: PathOrFileDescriptorTypes,
@@ -12836,7 +12627,7 @@ declare interface ReadFileTypes {
 			| "binary"
 			| "hex"
 			| ({ encoding: BufferEncoding; flag?: string } & Abortable),
-		callback: (err: null | NodeJS.ErrnoException, result?: string) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string) => void
 	): void;
 	(
 		path: PathOrFileDescriptorTypes,
@@ -12857,13 +12648,13 @@ declare interface ReadFileTypes {
 			| "hex"
 			| (ObjectEncodingOptions & { flag?: string } & Abortable),
 		callback: (
-			err: null | NodeJS.ErrnoException,
-			result?: string | Buffer
+			arg0: null | NodeJS.ErrnoException,
+			arg1?: string | Buffer
 		) => void
 	): void;
 	(
 		path: PathOrFileDescriptorTypes,
-		callback: (err: null | NodeJS.ErrnoException, result?: Buffer) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: Buffer) => void
 	): void;
 }
 declare interface ReaddirFs {
@@ -12949,7 +12740,7 @@ declare interface ReaddirFs {
 		},
 		callback: (
 			err: null | NodeJS.ErrnoException,
-			files?: Dirent<string>[]
+			files?: DirentFs<string>[]
 		) => void
 	): void;
 	(
@@ -12957,7 +12748,7 @@ declare interface ReaddirFs {
 		options: { encoding: "buffer"; withFileTypes: true; recursive?: boolean },
 		callback: (
 			err: null | NodeJS.ErrnoException,
-			files: Dirent<Buffer>[]
+			files: DirentFs<Buffer>[]
 		) => void
 	): void;
 }
@@ -13027,11 +12818,11 @@ declare interface ReaddirSync {
 			withFileTypes: true;
 			recursive?: boolean;
 		}
-	): Dirent<string>[];
+	): DirentFs<string>[];
 	(
 		path: PathLikeFs,
 		options: { encoding: "buffer"; withFileTypes: true; recursive?: boolean }
-	): Dirent<Buffer>[];
+	): DirentFs<Buffer>[];
 }
 declare interface ReaddirTypes {
 	(
@@ -13069,14 +12860,18 @@ declare interface ReaddirTypes {
 					withFileTypes?: false;
 					recursive?: boolean;
 			  },
-		callback: (err: null | NodeJS.ErrnoException, files?: string[]) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string[]) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options:
 			| "buffer"
 			| { encoding: "buffer"; withFileTypes?: false; recursive?: boolean },
-		callback: (err: null | NodeJS.ErrnoException, files?: Buffer[]) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: Buffer[]) => void
+	): void;
+	(
+		path: PathLikeTypes,
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string[]) => void
 	): void;
 	(
 		path: PathLikeTypes,
@@ -13100,13 +12895,9 @@ declare interface ReaddirTypes {
 					recursive?: boolean;
 			  }),
 		callback: (
-			err: null | NodeJS.ErrnoException,
-			files?: string[] | Buffer[]
+			arg0: null | NodeJS.ErrnoException,
+			arg1?: string[] | Buffer[]
 		) => void
-	): void;
-	(
-		path: PathLikeTypes,
-		callback: (err: null | NodeJS.ErrnoException, files?: string[]) => void
 	): void;
 	(
 		path: PathLikeTypes,
@@ -13114,18 +12905,7 @@ declare interface ReaddirTypes {
 			withFileTypes: true;
 			recursive?: boolean;
 		},
-		callback: (
-			err: null | NodeJS.ErrnoException,
-			files?: Dirent<string>[]
-		) => void
-	): void;
-	(
-		path: PathLikeTypes,
-		options: { encoding: "buffer"; withFileTypes: true; recursive?: boolean },
-		callback: (
-			err: null | NodeJS.ErrnoException,
-			files: Dirent<Buffer>[]
-		) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: DirentTypes[]) => void
 	): void;
 }
 declare interface ReadlinkFs {
@@ -13161,24 +12941,24 @@ declare interface ReadlinkTypes {
 	(
 		path: PathLikeTypes,
 		options: EncodingOption,
-		callback: (err: null | NodeJS.ErrnoException, result?: string) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: BufferEncodingOption,
-		callback: (err: null | NodeJS.ErrnoException, result?: Buffer) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: Buffer) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: EncodingOption,
 		callback: (
-			err: null | NodeJS.ErrnoException,
-			result?: string | Buffer
+			arg0: null | NodeJS.ErrnoException,
+			arg1?: string | Buffer
 		) => void
 	): void;
 	(
 		path: PathLikeTypes,
-		callback: (err: null | NodeJS.ErrnoException, result?: string) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string) => void
 	): void;
 }
 declare class RealContentHashPlugin {
@@ -13241,24 +13021,24 @@ declare interface RealPathTypes {
 	(
 		path: PathLikeTypes,
 		options: EncodingOption,
-		callback: (err: null | NodeJS.ErrnoException, result?: string) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: BufferEncodingOption,
-		callback: (err: null | NodeJS.ErrnoException, result?: Buffer) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: Buffer) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: EncodingOption,
 		callback: (
-			err: null | NodeJS.ErrnoException,
-			result?: string | Buffer
+			arg0: null | NodeJS.ErrnoException,
+			arg1?: string | Buffer
 		) => void
 	): void;
 	(
 		path: PathLikeTypes,
-		callback: (err: null | NodeJS.ErrnoException, result?: string) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: string) => void
 	): void;
 }
 type Records = KnownRecords &
@@ -13519,9 +13299,6 @@ declare interface ResolveBuildDependenciesResult {
 	resolveDependencies: ResolveDependencies;
 }
 declare interface ResolveContext {
-	/**
-	 * directories that was found on file system
-	 */
 	contextDependencies?: WriteOnlySet<string>;
 
 	/**
@@ -13542,12 +13319,12 @@ declare interface ResolveContext {
 	/**
 	 * log function
 	 */
-	log?: (str: string) => void;
+	log?: (arg0: string) => void;
 
 	/**
 	 * yield result, if provided plugins can return several results
 	 */
-	yield?: (request: ResolveRequest) => void;
+	yield?: (arg0: ResolveRequest) => void;
 }
 declare interface ResolveData {
 	contextInfo: ModuleFactoryCreateDataContextInfo;
@@ -13775,139 +13552,36 @@ declare interface ResolveOptions {
 	useSyncFileSystemCalls?: boolean;
 }
 declare interface ResolveOptionsResolverFactoryObject1 {
-	/**
-	 * alias
-	 */
 	alias: AliasOption[];
-
-	/**
-	 * fallback
-	 */
 	fallback: AliasOption[];
-
-	/**
-	 * alias fields
-	 */
 	aliasFields: Set<string | string[]>;
-
-	/**
-	 * extension alias
-	 */
 	extensionAlias: ExtensionAliasOption[];
-
-	/**
-	 * cache predicate
-	 */
-	cachePredicate: (predicate: ResolveRequest) => boolean;
-
-	/**
-	 * cache with context
-	 */
+	cachePredicate: (arg0: ResolveRequest) => boolean;
 	cacheWithContext: boolean;
 
 	/**
 	 * A list of exports field condition names.
 	 */
 	conditionNames: Set<string>;
-
-	/**
-	 * description files
-	 */
 	descriptionFiles: string[];
-
-	/**
-	 * enforce extension
-	 */
 	enforceExtension: boolean;
-
-	/**
-	 * exports fields
-	 */
 	exportsFields: Set<string | string[]>;
-
-	/**
-	 * imports fields
-	 */
 	importsFields: Set<string | string[]>;
-
-	/**
-	 * extensions
-	 */
 	extensions: Set<string>;
-
-	/**
-	 * fileSystem
-	 */
 	fileSystem: FileSystem;
-
-	/**
-	 * unsafe cache
-	 */
-	unsafeCache: false | CacheTypes;
-
-	/**
-	 * symlinks
-	 */
+	unsafeCache: false | object;
 	symlinks: boolean;
-
-	/**
-	 * resolver
-	 */
 	resolver?: Resolver;
-
-	/**
-	 * modules
-	 */
 	modules: (string | string[])[];
-
-	/**
-	 * main fields
-	 */
 	mainFields: { name: string[]; forceRelative: boolean }[];
-
-	/**
-	 * main files
-	 */
 	mainFiles: Set<string>;
-
-	/**
-	 * plugins
-	 */
 	plugins: Plugin[];
-
-	/**
-	 * pnp API
-	 */
 	pnpApi: null | PnpApi;
-
-	/**
-	 * roots
-	 */
 	roots: Set<string>;
-
-	/**
-	 * fully specified
-	 */
 	fullySpecified: boolean;
-
-	/**
-	 * resolve to context
-	 */
 	resolveToContext: boolean;
-
-	/**
-	 * restrictions
-	 */
 	restrictions: Set<string | RegExp>;
-
-	/**
-	 * prefer relative
-	 */
 	preferRelative: boolean;
-
-	/**
-	 * prefer absolute
-	 */
 	preferAbsolute: boolean;
 }
 declare interface ResolveOptionsResolverFactoryObject2 {
@@ -13934,7 +13608,7 @@ declare interface ResolveOptionsResolverFactoryObject2 {
 	/**
 	 * A function which decides whether a request should be cached or not. An object is passed with at least `path` and `request` properties.
 	 */
-	cachePredicate?: (predicate: ResolveRequest) => boolean;
+	cachePredicate?: (arg0: ResolveRequest) => boolean;
 
 	/**
 	 * Whether or not the unsafeCache should include request context as part of the cache key.
@@ -13979,7 +13653,7 @@ declare interface ResolveOptionsResolverFactoryObject2 {
 	/**
 	 * Use this cache object to unsafely cache the successful requests
 	 */
-	unsafeCache?: boolean | CacheTypes;
+	unsafeCache?: boolean | object;
 
 	/**
 	 * Resolve symlinks to their symlinked location
@@ -15472,45 +15146,15 @@ declare class Source {
 	updateHash(hash: HashLike): void;
 }
 declare interface SourceAndMap {
-	/**
-	 * source
-	 */
 	source: SourceValue;
-
-	/**
-	 * map
-	 */
 	map: null | RawSourceMap;
 }
 declare interface SourceLike {
-	/**
-	 * source
-	 */
 	source: () => SourceValue;
-
-	/**
-	 * buffer
-	 */
 	buffer?: () => Buffer;
-
-	/**
-	 * size
-	 */
 	size?: () => number;
-
-	/**
-	 * map
-	 */
 	map?: (options?: MapOptions) => null | RawSourceMap;
-
-	/**
-	 * source and map
-	 */
 	sourceAndMap?: (options?: MapOptions) => SourceAndMap;
-
-	/**
-	 * hash updater
-	 */
 	updateHash?: (hash: HashLike) => void;
 }
 declare class SourceMapDevToolPlugin {
@@ -15764,24 +15408,24 @@ declare interface StatSyncOptions {
 declare interface StatTypes {
 	(
 		path: PathLikeTypes,
-		callback: (err: null | NodeJS.ErrnoException, result?: IStats) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: IStats) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: undefined | (StatOptions & { bigint?: false }),
-		callback: (err: null | NodeJS.ErrnoException, result?: IStats) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: IStats) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: StatOptions & { bigint: true },
-		callback: (err: null | NodeJS.ErrnoException, result?: IBigIntStats) => void
+		callback: (arg0: null | NodeJS.ErrnoException, arg1?: IBigIntStats) => void
 	): void;
 	(
 		path: PathLikeTypes,
 		options: undefined | StatOptions,
 		callback: (
-			err: null | NodeJS.ErrnoException,
-			result?: IStats | IBigIntStats
+			arg0: null | NodeJS.ErrnoException,
+			arg1?: IStats | IBigIntStats
 		) => void
 	): void;
 }
@@ -16554,6 +16198,11 @@ declare interface TrustedTypes {
 	policyName?: string;
 }
 declare const UNDEFINED_MARKER: unique symbol;
+
+/**
+ * `URL` class is a global reference for `require('url').URL`
+ * https://nodejs.org/api/url.html#the-whatwg-url-api
+ */
 declare interface URL_url extends URL {}
 type UnsafeCacheData = KnownUnsafeCacheData & Record<string, any>;
 declare interface UpdateHashContextDependency {
@@ -17164,7 +16813,6 @@ declare interface WriteFile {
 			| Int32Array
 			| BigUint64Array
 			| BigInt64Array
-			| Float16Array
 			| Float32Array
 			| Float64Array
 			| DataView,
@@ -17184,7 +16832,6 @@ declare interface WriteFile {
 			| Int32Array
 			| BigUint64Array
 			| BigInt64Array
-			| Float16Array
 			| Float32Array
 			| Float64Array
 			| DataView,
@@ -17851,7 +17498,7 @@ declare namespace exports {
 		AutomaticPrefetchPlugin,
 		AsyncDependenciesBlock,
 		BannerPlugin,
-		CacheClass as Cache,
+		Cache,
 		Chunk,
 		ChunkGraph,
 		CleanPlugin,
